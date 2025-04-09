@@ -13,7 +13,7 @@
   "license": "ISC",
   "author": "Gammer Evgeniy",
   "type": "module",
-  "main": "index.js",
+  "main": "bin/gendiff.js",
   "bin": {
     "gendiff": "bin/gendiff.js"
   },
