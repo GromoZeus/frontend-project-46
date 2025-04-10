@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import readFilePath from '../scr/parsefile.js';
+import getCalcDiff from '../scr/index.js';
 
 const program = new Command();
 program
@@ -12,6 +13,7 @@ program
   .argument('<filepath2>')
   .action((filepath1, filepath2) => {
     const [fileData1, fileData2] = [readFilePath(filepath1), readFilePath(filepath2)];
+    console.log(getCalcDiff(fileData1, fileData2));
   });
 
 program.parse();
