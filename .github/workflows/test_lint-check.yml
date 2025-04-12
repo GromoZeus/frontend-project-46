@@ -1,0 +1,36 @@
+name: Test and Lint
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # Запусти последнюю Ubuntu
+    steps:
+      - name: Checkout repository  # Делаем git clone из нашего репозитория
+        uses: actions/checkout@v4
+      - name: Set up Node.js  # Устанавливаем ноду
+        uses: actions/setup-node@v4  
+        with:
+          node-version: '20'  # Версия ноды
+          cache: 'npm'  # Кэшируем node_modules
+      - name: Install dependencies  # Устанавливаем зависимости проекта
+        run: npm ci
+      - name: Run tests  # Запуск тестов (Jest)
+        run: npm test  
+  
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository  # Делаем git clone из нашего репозитория
+        uses: actions/checkout@v4
+      - name: Set up Node.js  # Устанавливаем ноду
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'  # Версия ноды
+          cache: 'npm'  # Кэшируем node_modules
+      - name: Install dependencies  # Устанавливаем зависимости проекта
+        run: npm ci
+      - name: Run linter  # Запуск линтера (ESLint)
+        run: npm run lint  
