@@ -18,7 +18,8 @@
     "gendiff": "bin/gendiff.js"
   },
   "scripts": {
-    "test": "jest --watch"
+    "test": "jest",
+    "lint": "eslint . --ext .js"
   },
   "devDependencies": {
     "@eslint/js": "^9.24.0",
