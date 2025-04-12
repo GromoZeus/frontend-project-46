@@ -16,7 +16,7 @@ jobs:
           node-version: '20'  # Версия ноды
           cache: 'npm'  # Кэшируем node_modules
       - name: Install dependencies  # Устанавливаем зависимости проекта
-        run: npm ci
+        run: npm ci --force
       - name: Run tests  # Запуск тестов (Jest)
         run: npm test  
   
@@ -31,6 +31,6 @@ jobs:
           node-version: '20'  # Версия ноды
           cache: 'npm'  # Кэшируем node_modules
       - name: Install dependencies  # Устанавливаем зависимости проекта
-        run: npm ci
+        run: npm ci --force
       - name: Run linter  # Запуск линтера (ESLint)
         run: npm run lint  
