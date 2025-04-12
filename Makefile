@@ -7,3 +7,5 @@ lint: # проверка кода
 publish: # публикация пакета
 	npm publish --dry-run
 	
+test: # запуск тестов
+	npm test
