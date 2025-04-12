@@ -16,5 +16,5 @@ export default (objA, objB) => {
     }
     return acc;
   }, []);
-  return `{\n${result.join('\n')}\n}`;
+  return result.length ? `{\n${result.join('\n')}\n}` : '{\n}';
 };

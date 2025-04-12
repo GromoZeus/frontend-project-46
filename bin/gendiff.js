@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import readFilePath from '../scr/parsefile.js';
-import getCalcDiff from '../scr/index.js';
+import readFilePath from '../src/parsefile.js';
+import getCalcDiff from '../src/index.js';
 
 const program = new Command();
 program
