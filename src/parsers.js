@@ -9,14 +9,15 @@ export default (file) => {
     const relPath = readFileSync(resolve(cwd(), file), 'utf8');
     const ext = extname(file);
     if (ext === '.json') {
-    return isAbsolute(file) ? JSON.parse(absPath)
-      : JSON.parse(relPath);
-    } else if (ext === '.yaml' || ext === '.yml') {
-      return isAbsolute(file) ? load(absPath)
-      : load(relPath);
+      return isAbsolute(file) ? JSON.parse(absPath)
+        : JSON.parse(relPath);
     }
-  } catch (error) {
-    console.error(`Error reading file: ${error.message}`);
-    return null;
+    if (ext === '.yaml' || ext === '.yml') {
+      return (isAbsolute(file) ? load(absPath)
+        : load(relPath)) ?? '';
+    }
+  } catch {
+    return 0;
   }
+  return null;
 };
