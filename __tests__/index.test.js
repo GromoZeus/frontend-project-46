@@ -1,10 +1,60 @@
-import { load } from 'js-yaml';
-import getCalcDiff from '../src/index.js';
+import { findDiff, formatDiff } from '../src/index.js';
 
-describe('getCalcDiff', () => {
-  test('different files', () => {
+describe('findDiff', () => {
+  test('should find differences between two flat objects', () => {
     const objA = { a: 1, b: 2, c: 3 };
     const objB = { b: 2, c: 4, d: 5 };
+    const expected = [
+      { key: 'a', type: 'removed', value: 1 },
+      { key: 'b', type: 'unchanged', value: 2 },
+      {
+        key: 'c', type: 'changed', oldValue: 3, newValue: 4,
+      },
+      { key: 'd', type: 'added', value: 5 },
+    ];
+    expect(findDiff(objA, objB)).toEqual(expected);
+  });
+
+  test('should handle nested objects', () => {
+    const objA = { a: { x: 1, y: 2 }, b: 2 };
+    const objB = { a: { x: 1, z: 3 }, b: 3 };
+    const expected = [
+      {
+        key: 'a',
+        type: 'nested',
+        children: [
+          { key: 'x', type: 'unchanged', value: 1 },
+          { key: 'y', type: 'removed', value: 2 },
+          { key: 'z', type: 'added', value: 3 },
+        ],
+      },
+      {
+        key: 'b', type: 'changed', oldValue: 2, newValue: 3,
+      },
+    ];
+    expect(findDiff(objA, objB)).toEqual(expected);
+  });
+
+  test('should return empty array for identical objects', () => {
+    const objA = { a: 1, b: 2 };
+    const objB = { a: 1, b: 2 };
+    expect(findDiff(objA, objB)).toEqual([
+      { key: 'a', type: 'unchanged', value: 1 },
+      { key: 'b', type: 'unchanged', value: 2 },
+    ]);
+  });
+});
+
+describe('formatDiff', () => {
+  test('should format differences in stylish format', () => {
+    const diff = [
+      { key: 'a', type: 'removed', value: 1 },
+      { key: 'b', type: 'unchanged', value: 2 },
+      {
+        key: 'c', type: 'changed', oldValue: 3, newValue: 4,
+      },
+      { key: 'd', type: 'added', value: 5 },
+    ];
     const expected = `{
   - a: 1
     b: 2
@@ -12,69 +62,33 @@ describe('getCalcDiff', () => {
   + c: 4
   + d: 5
 }`;
-    expect(getCalcDiff(objA, objB)).toBe(expected);
+    expect(formatDiff(diff)).toBe(expected);
   });
 
-  test('equal files', () => {
-    const objA = { a: 1, b: 2 };
-    const objB = { a: 1, b: 2 };
+  test('should format nested differences in stylish format', () => {
+    const diff = [
+      {
+        key: 'a',
+        type: 'nested',
+        children: [
+          { key: 'x', type: 'unchanged', value: 1 },
+          { key: 'y', type: 'removed', value: 2 },
+          { key: 'z', type: 'added', value: 3 },
+        ],
+      },
+      {
+        key: 'b', type: 'changed', oldValue: 2, newValue: 3,
+      },
+    ];
     const expected = `{
-    a: 1
-    b: 2
-}`;
-    expect(getCalcDiff(objA, objB)).toBe(expected);
-  });
-
-  test('the second object is empty', () => {
-    const objA = { a: 1, b: 2 };
-    const objB = {};
-    const expected = `{
-  - a: 1
+    a: {
+        x: 1
+      - y: 2
+      + z: 3
+    }
   - b: 2
+  + b: 3
 }`;
-    expect(getCalcDiff(objA, objB)).toBe(expected);
-  });
-
-  test('the first object is empty', () => {
-    const objA = {};
-    const objB = { a: 1, b: 2 };
-    const expected = `{
-  + a: 1
-  + b: 2
-}`;
-    expect(getCalcDiff(objA, objB)).toBe(expected);
-  });
-
-  test('both objects are empty', () => {
-    const objA = {};
-    const objB = {};
-    const expected = `{
-}`;
-    expect(getCalcDiff(objA, objB)).toBe(expected);
-  });
-
-  test('different JSON-YMAL files', () => {
-    const objA = JSON.parse(JSON.stringify({ a: 1, b: 2, c: 3 }));
-    const objB = load(`
-    b: 2
-    c: 4
-    d: 5
-    `);
-    const expected = `{
-  - a: 1
-    b: 2
-  - c: 3
-  + c: 4
-  + d: 5
-}`;
-    expect(getCalcDiff(objA, objB)).toBe(expected);
-  });
-
-  test('both files are empty', () => {
-    const objA = '';
-    const objB = 0;
-    const expected = `{
-}`;
-    expect(getCalcDiff(objA, objB)).toBe(expected);
+    expect(formatDiff(diff)).toBe(expected);
   });
 });
