@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import readFilePath from '../src/parsers.js';
-import { findDiff, formatDiff } from '../src/index.js';
+import { genDiff } from '../src/index.js';
 
 const program = new Command();
 program
@@ -12,8 +11,8 @@ program
   .argument('<filepath1>')
   .argument('<filepath2>')
   .action((filepath1, filepath2) => {
-    const [fileData1, fileData2] = [readFilePath(filepath1), readFilePath(filepath2)];
-    console.log(formatDiff(findDiff(fileData1, fileData2)));
+    const result = genDiff(filepath1, filepath2, program.opts().format);
+    console.log(result);
   });
 
 program.parse();

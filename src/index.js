@@ -1,11 +1,15 @@
-import _ from 'lodash';
+import sortBy from 'lodash/sortBy.js';
+import union from 'lodash/union.js';
+import isObject from 'lodash/isObject.js';
+import readFilePath from './parsers.js';
+import getFormat from './formatters/index.js';
 
-const findDiff = (objA, objB) => {
+export const findDiff = (objA, objB) => {
   const keyA = Object.keys(objA);
   const keyB = Object.keys(objB);
-  const allKeys = _.sortBy(_.union(keyA, keyB));
+  const allKeys = sortBy(union(keyA, keyB));
   const result = allKeys.reduce((acc, key) => {
-    if (_.isObject(objA[key]) && _.isObject(objB[key])) {
+    if (isObject(objA[key]) && isObject(objB[key])) {
       const nestedDiff = findDiff(objA[key], objB[key]);
       acc.push({ key, type: 'nested', children: nestedDiff });
     } else if (!keyB.includes(key)) {
@@ -26,49 +30,8 @@ const findDiff = (objA, objB) => {
   return result;
 };
 
-const formatDiff = (diff, format = 'stylish') => {
-  const stylishFormatter = (data, depth = 1) => {
-    const indentSize = '  '.repeat(depth);
-    const formatValue = (value, valdepth = depth) => {
-      if (_.isObject(value)) {
-        const nestedIndent = '  '.repeat(valdepth + 3);
-        const bracketIndent = '  '.repeat(valdepth);
-        const entries = Object.entries(value)
-          .map(([key, val]) => `${nestedIndent}${key}: ${formatValue(val, valdepth + 2)}`);
-        return `{\n${entries.join('\n')}\n${bracketIndent}  }`;
-      }
-      return value;
-    };
-
-    const lines = data.map((item) => {
-      switch (item.type) {
-        case 'nested':
-          return `${indentSize}  ${item.key}: {\n${stylishFormatter(item.children, depth + 2)}\n${indentSize}  }`;
-        case 'removed':
-          return `${indentSize}- ${item.key}: ${formatValue(item.value)}`;
-        case 'added':
-          return `${indentSize}+ ${item.key}: ${formatValue(item.value)}`;
-        case 'changed':
-          return `${indentSize}- ${item.key}: ${formatValue(item.oldValue)}\n${indentSize}+ ${item.key}: ${formatValue(item.newValue)}`;
-        case 'unchanged':
-          return `${indentSize}  ${item.key}: ${formatValue(item.value)}`;
-        default:
-          return '';
-      }
-    });
-
-    return lines.join('\n');
-  };
-  switch (format) {
-    case 'stylish':
-      return `{\n${stylishFormatter(diff)}\n}`;
-    // case 'plain':
-    //   return plainFormatter(diff);
-    // case 'json':
-    //   return jsonFormatter(diff);
-    default:
-      throw new Error(`Unknown format: ${format}`);
-  }
+export const genDiff = (filepath1, filepath2, formatStyle) => {
+  const diff = findDiff(readFilePath(filepath1), readFilePath(filepath2));
+  const showFormat = getFormat(diff, formatStyle);
+  return showFormat;
 };
-
-export { findDiff, formatDiff };
