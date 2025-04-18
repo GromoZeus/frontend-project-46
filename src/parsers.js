@@ -5,18 +5,19 @@ import { load } from 'js-yaml';
 
 export default (file) => {
   try {
-    const absPath = readFileSync(file, 'utf8');
-    const relPath = readFileSync(resolve(cwd(), file), 'utf8');
+    const path = isAbsolute(file) ? file : resolve(cwd(), file);
+    const context = readFileSync(path, 'utf8');
     const ext = extname(file);
     if (ext === '.json') {
-      return isAbsolute(file) ? JSON.parse(absPath)
-        : JSON.parse(relPath);
+      return isAbsolute(file) ? JSON.parse(context)
+        : JSON.parse(context);
     }
     if (ext === '.yaml' || ext === '.yml') {
-      return (isAbsolute(file) ? load(absPath)
-        : load(relPath)) ?? '';
+      return (isAbsolute(file) ? load(context)
+        : load(context)) ?? '';
     }
-  } catch {
+  } catch (error) {
+    console.error(`Error reading file: ${error.message}`);
     return 0;
   }
   return null;
