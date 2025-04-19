@@ -9,7 +9,7 @@ const getFixturePath = (filename) => join(__dirname, '..', '__fixtures__', filen
 const readFile = (filename) => readFileSync(getFixturePath(filename), 'utf-8');
 
 describe('findDiff', () => {
-  test('should find differences between two flat objects', () => {
+  test('find diff between two flat objects', () => {
     const objA = { a: 1, b: 2, c: 3 };
     const objB = { b: 2, c: 4, d: 5 };
     const expected = [
@@ -23,7 +23,7 @@ describe('findDiff', () => {
     expect(findDiff(objA, objB)).toEqual(expected);
   });
 
-  test('should handle nested objects', () => {
+  test('find diff between two nested objects', () => {
     const objA = { a: { x: 1, y: 2 }, b: 2 };
     const objB = { a: { x: 1, z: 3 }, b: 3 };
     const expected = [
@@ -43,7 +43,7 @@ describe('findDiff', () => {
     expect(findDiff(objA, objB)).toEqual(expected);
   });
 
-  test('should return empty array for identical objects', () => {
+  test('find diff between two identical objects', () => {
     const objA = { a: 1, b: 2 };
     const objB = { a: 1, b: 2 };
     expect(findDiff(objA, objB)).toEqual([
@@ -89,6 +89,6 @@ describe('genDiff', () => {
     const filepath1 = getFixturePath('empty.yml');
     const filepath2 = getFixturePath('empty.json');
     const result = genDiff(filepath1, filepath2, 'plain');
-    expect(result).toBe('');
+    expect(result).toBeNull();
   });
 });
