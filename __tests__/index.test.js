@@ -91,4 +91,11 @@ describe('genDiff', () => {
     const result = genDiff(filepath1, filepath2, 'plain');
     expect(result).toBeNull();
   });
+
+  test('diff with two invalid files', () => {
+    const filepath1 = getFixturePath('file1.yml');
+    const filepath2 = getFixturePath('file2.yml');
+    const result = genDiff(filepath1, filepath2, 'invalid');
+    expect(result).toBeNull();
+  });
 });
