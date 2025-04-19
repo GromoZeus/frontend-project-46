@@ -23,10 +23,8 @@ export const findDiff = (objA, objB) => {
     } else {
       acc.push({ key, type: 'unchanged', value: objA[key] });
     }
-
     return acc;
   }, []);
-
   return result;
 };
 
